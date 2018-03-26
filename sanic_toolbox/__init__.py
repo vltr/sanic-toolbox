@@ -1,6 +1,8 @@
 import logging
 
 from .lazyapp import lazyapp
+from .blueprint import _Blueprint as Blueprint
+from .blueprint import _Sanic as Sanic
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
@@ -10,4 +12,6 @@ __description__ = 'A general utility toolbox for Sanic to make middleware workfl
 
 __all__ = [
     'lazyapp',
+    'Blueprint',
+    'Sanic'
 ]

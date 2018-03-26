@@ -34,7 +34,7 @@ install_requires = []
 
 about = {'version': '0.1.0', 'description': ''}
 
-with open(os.path.join(here, 'sanic-toolbox', '__init__.py'), 'r', encoding='utf-8') as f:
+with open(os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8') as f:
     for line in f:
         if line.startswith('__version__'):
             about['version'] = line.strip().split('=')[1].strip(' \'"')

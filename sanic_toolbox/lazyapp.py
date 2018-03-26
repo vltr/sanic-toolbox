@@ -21,7 +21,7 @@ class LazyApplication:
         self._response_middleware = deque()
         self._tasks = deque()
 
-    def listener(self, event, before=None, after=None):
+    def listener(self, event, *, before=None, after=None):
         """Create a listener from a decorated function.
         :param event: event to listen to
         """
@@ -72,7 +72,7 @@ class LazyApplication:
             attach_middleware_to.append(middleware)
         return middleware
 
-    def middleware(self, middleware_or_request, before=None, after=None):
+    def middleware(self, middleware_or_request, *, before=None, after=None):
         """Decorate and register middleware to be called before a request.
         Can either be called as @app.middleware or @app.middleware('request')
         """
@@ -88,7 +88,7 @@ class LazyApplication:
                 before=before,
                 after=after)
 
-    def add_task(self, task, before=None, after=None):
+    def add_task(self, task, *, before=None, after=None):
         """Schedule a task to run later, after the loop has started.
         Different from asyncio.ensure_future in that it does not
         also return a future, and the actual ensure_future call
