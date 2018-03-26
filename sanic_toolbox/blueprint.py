@@ -9,8 +9,9 @@ class _Sanic(Sanic):
 
     def blueprint(self, blueprint, **options):
         super().blueprint(blueprint, **options)
-        for bp in blueprint.nested:
-            super().blueprint(bp, **options)
+        if hasattr(blueprint, 'nested'):
+            for bp in blueprint.nested:
+                super().blueprint(bp, **options)
 
 
 class _Blueprint(Blueprint):
