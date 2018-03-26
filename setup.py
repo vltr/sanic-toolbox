@@ -32,7 +32,7 @@ setup_requires = [
 
 install_requires = []
 
-about = {'version': '0.1.0', 'description': ''}
+about = {'version': '0.2.0', 'description': ''}
 
 with open(os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8') as f:
     for line in f:
@@ -51,10 +51,10 @@ setup(
     author_email='rkuesters@gmail.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
@@ -65,4 +65,8 @@ setup(
     setup_requires=setup_requires,
     tests_require=tests_require,
     package_data={},
+    project_urls={  # Optional
+        'Bug Reports': 'https://github.com/vltr/sanic-toolbox/issues',
+        'Source': 'https://github.com/vltr/sanic-toolbox',
+    },
 )
