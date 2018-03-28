@@ -11,7 +11,9 @@ from sanic_toolbox import lazyapp
 
 # DO NOT USE THIS IN PRODUCTION, THIS IS JUST A PROOF OF CONCEPT
 
+
 class MyInterface:
+
     def __init__(self):
         self.session_store = dict()
 

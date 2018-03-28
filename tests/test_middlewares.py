@@ -7,8 +7,7 @@ from sanic.response import json
 
 from sanic_toolbox import lazyapp
 from sanic_toolbox.exceptions import (
-    BeforeAndAfterNotSupported,
-    MiddlewareNotFound
+    BeforeAndAfterNotSupported, MiddlewareNotFound
 )
 
 
@@ -78,7 +77,8 @@ def test_middleware_user_order(a_lazy_app):
     dumb_app = a_lazy_app
 
     real_app = dumb_app(
-        Sanic(name='test-middlewares-1'), sanic_response_order=False)
+        Sanic(name='test-middlewares-1'), sanic_response_order=False
+    )
 
     @real_app.route('/')
     async def test(request):

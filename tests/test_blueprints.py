@@ -1,7 +1,8 @@
 import pytest
 
-from sanic_toolbox import Sanic, Blueprint
+from sanic import Blueprint as SanicBlueprint
 from sanic.response import json
+from sanic_toolbox import Sanic, Blueprint, bp_middleware
 
 
 class Result:
@@ -20,16 +21,17 @@ def myapp():
     blueprint_one = Blueprint('one', url_prefix='/one')
     nested_blueprint = blueprint_one.bp('test', url_prefix='/test')
     blueprint_two = Blueprint('two', url_prefix='/two')
+    blueprint_three = SanicBlueprint('three', url_prefix='/three')
 
-    @nested_blueprint.strict_middleware('request')
+    @bp_middleware(nested_blueprint, 'request')
     async def hello_from_nested_blueprint(request):
         Result.request_middleware.append('hello_from_blueprint')
 
-    @nested_blueprint.strict_middleware('response')
+    @bp_middleware(nested_blueprint, 'response')
     async def goodbye_from_nested_blueprint(request, response):
         Result.response_middleware.append('goodbye_from_blueprint')
 
-    @blueprint_two.strict_middleware('request')
+    @bp_middleware(blueprint_two, 'request')
     async def hello_from_blueprint_two(request):
         return json({'hello': 'halted'})
 
@@ -45,9 +47,14 @@ def myapp():
     async def two_root(request):
         return json({'hello': 'two root'})
 
+    @blueprint_three.route('/')
+    async def three_root(request):
+        return json({'hello': 'three root'})
+
     app = Sanic(name='test-blueprints')
     app.blueprint(blueprint_one, url_prefix='/this/will/be/ignored')
     app.blueprint(blueprint_two)
+    app.blueprint(blueprint_three, url_prefix='/notthree')
 
     @app.middleware('request')
     async def on_request(request):
@@ -94,6 +101,10 @@ def test_nested_blueprints(myapp):
     request, response = myapp.test_client.get('/two')
     assert response.status == 200
     assert response.json.get('hello') == 'halted'
+
+    request, response = myapp.test_client.get('/notthree')
+    assert response.status == 200
+    assert response.json.get('hello') == 'three root'
 
     request, response = myapp.test_client.get('/one/test')
     assert response.status == 200

@@ -15,10 +15,8 @@ tests_require = [
 ]
 
 extras_require = {
-    'docs': [
-        # 'sphinx_rtd_theme',
-        'Sphinx',
-    ],
+    'docs': ['Sphinx'],
+    # 'sphinx_rtd_theme',
     'tests': tests_require,
 }
 
@@ -26,15 +24,15 @@ extras_require['all'] = []
 for reqs in extras_require.values():
     extras_require['all'].extend(reqs)
 
-setup_requires = [
-    'pytest-runner',
-]
+setup_requires = ['pytest-runner']
 
 install_requires = []
 
-about = {'version': '0.2.0', 'description': ''}
+about = {'version': '0.3.0', 'description': ''}
 
-with open(os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8') as f:
+with open(
+    os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8'
+) as f:
     for line in f:
         if line.startswith('__version__'):
             about['version'] = line.strip().split('=')[1].strip(' \'"')

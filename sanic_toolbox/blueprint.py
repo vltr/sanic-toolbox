@@ -16,13 +16,15 @@ class _Sanic(Sanic):
 
 class _Blueprint(Blueprint):
 
-    def __init__(self,
-                 name,
-                 url_prefix,
-                 *,
-                 host=None,
-                 version=None,
-                 strict_slashes=False):
+    def __init__(
+        self,
+        name,
+        url_prefix,
+        *,
+        host=None,
+        version=None,
+        strict_slashes=False
+    ):
         super().__init__(
             name,
             url_prefix=url_prefix,
@@ -56,32 +58,32 @@ class _Blueprint(Blueprint):
         self._blueprints.append(bp)
         return bp
 
-    def strict_middleware(self, attach_to='request'):
 
-        def middleware(f):
+def bp_middleware(bp, attach_to='request'):
 
-            @wraps(f)
-            async def inner_middleware(request, *args):
-                if request.path.startswith(self.url_prefix):
-                    if attach_to == 'request':
-                        response = f(request)
-                    elif attach_to == 'response':
-                        response = f(request, *args)
-                    else:
-                        # TODO see what fits best here, an custom exception or
-                        # just return None?
-                        raise Exception('or return None?')  # noqa
+    def middleware(f):
 
-                    if inspect.isawaitable(response):
-                        response = await response  # noqa
-                    return response
+        @wraps(f)
+        async def inner_middleware(request, *args):
+            if request.path.startswith(bp.url_prefix):
+                if attach_to == 'request':
+                    response = f(request)
+                elif attach_to == 'response':
+                    response = f(request, *args)
+                else:
+                    # TODO see what fits best here, an custom exception or
+                    # just return None?
+                    raise Exception('or return None?')  # noqa
 
-            future_middleware = FutureMiddleware(inner_middleware, [attach_to],
-                                                 {})
-            self.middlewares.append(future_middleware)
-            return future_middleware
+                if inspect.isawaitable(response):
+                    response = await response  # noqa
+                return response
 
-        return middleware
+        future_middleware = FutureMiddleware(inner_middleware, [attach_to], {})
+        bp.middlewares.append(future_middleware)
+        return future_middleware
+
+    return middleware
 
 
-__all__ = ['_Blueprint', '_Sanic']
+__all__ = ['_Blueprint', '_Sanic', 'bp_middleware']

@@ -6,7 +6,7 @@ from .exceptions import (
     BeforeAndAfterNotSupported,
     ListenerNotFound,
     MiddlewareNotFound,
-    TaskNotFound
+    TaskNotFound,
 )
 
 
@@ -30,14 +30,17 @@ class LazyApplication:
             if any([before, after]):
                 if all([before, after]):
                     raise BeforeAndAfterNotSupported
+
             if before:
                 if before not in self._listeners[event]:
                     raise ListenerNotFound
+
                 idx = self._listeners[event].index(before)
                 self._listeners[event].insert(idx, listener)
             elif after:
                 if after not in self._listeners[event]:
                     raise ListenerNotFound
+
                 idx = self._listeners[event].index(after)
                 self._listeners[event].insert(idx + 1, listener)
             else:
@@ -46,8 +49,9 @@ class LazyApplication:
 
         return decorator
 
-    def register_middleware(self, middleware, attach_to='request', before=None,
-                            after=None):
+    def register_middleware(
+        self, middleware, attach_to='request', before=None, after=None
+    ):
 
         attach_middleware_to = []
         if attach_to == 'request':
@@ -58,14 +62,17 @@ class LazyApplication:
         if any([before, after]):
             if all([before, after]):
                 raise BeforeAndAfterNotSupported
+
         if before:
             if before not in attach_middleware_to:
                 raise MiddlewareNotFound
+
             idx = attach_middleware_to.index(before)
             attach_middleware_to.insert(idx, middleware)
         elif after:
             if after not in attach_middleware_to:
                 raise MiddlewareNotFound
+
             idx = attach_middleware_to.index(after)
             attach_middleware_to.insert(idx + 1, middleware)
         else:
@@ -79,14 +86,16 @@ class LazyApplication:
         # Detect which way this was called, @middleware or @middleware('AT')
         if callable(middleware_or_request):
             return self.register_middleware(
-                middleware_or_request, before=before, after=after)
+                middleware_or_request, before=before, after=after
+            )
 
         else:
             return partial(
                 self.register_middleware,
                 attach_to=middleware_or_request,
                 before=before,
-                after=after)
+                after=after,
+            )
 
     def add_task(self, task, *, before=None, after=None):
         """Schedule a task to run later, after the loop has started.
@@ -99,14 +108,17 @@ class LazyApplication:
         if any([before, after]):
             if all([before, after]):
                 raise BeforeAndAfterNotSupported
+
         if before:
             if before not in self._tasks:
                 raise TaskNotFound
+
             idx = self._tasks.index(before)
             self._tasks.insert(idx, task)
         elif after:
             if after not in self._tasks:
                 raise TaskNotFound
+
             idx = self._tasks.index(after)
             self._tasks.insert(idx + 1, task)
         else:
@@ -130,8 +142,9 @@ class LazyApplication:
         for middleware in self._response_middleware:
             app.register_middleware(middleware, 'response')
         for event, listeners in self._listeners.items():
-            if event in ('before_server_stop', 'after_server_stop') \
-                    and not sanic_listener_stop_order:
+            if event in (
+                'before_server_stop', 'after_server_stop'
+            ) and not sanic_listener_stop_order:
                 listeners.reverse()
             for listener in listeners:
                 app.listener(event)(listener)
@@ -146,14 +159,14 @@ class LazyApplication:
         self._response_middleware.clear()
         self._listeners.clear()
 
-    def __call__(self,
-                 app,
-                 sanic_response_order=True,
-                 sanic_listener_stop_order=True):
+    def __call__(
+        self, app, sanic_response_order=True, sanic_listener_stop_order=True
+    ):
         return self.apply(
             app,
             sanic_response_order=sanic_response_order,
-            sanic_listener_stop_order=sanic_listener_stop_order)
+            sanic_listener_stop_order=sanic_listener_stop_order,
+        )
 
 
 def lazyapp():
