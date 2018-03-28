@@ -4,7 +4,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/sanic-toolbox.svg)](https://pypi.python.org/pypi/sanic-toolbox)
 [![Version status](https://img.shields.io/pypi/status/sanic-toolbox.svg)](https://pypi.python.org/pypi/sanic-toolbox)
 [![MIT License](https://img.shields.io/pypi/l/sanic-toolbox.svg)](https://raw.githubusercontent.com/vltr/sanic-toolbox/master/LICENSE)
-
+[![Build Status](https://travis-ci.org/vltr/sanic-toolbox.svg?branch=master)](https://travis-ci.org/vltr/sanic-toolbox)
 
 Some useful classes to work with Sanic (that might depend on what you want to do with it).
 
