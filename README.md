@@ -23,6 +23,7 @@ _NOTE_: Those are likely (and mostly) experimentations with Sanic and probably w
 - [x] Make middleware workflows presumable and simple to implement
 - [x] Make simple Sanic structures "lazy" and "cloneable"
 - [x] Ability to work with blueprints
+- [x] Utilities to import Python modules dynamically
 - [ ] Plugin chaining
 - [ ] More examples of how this can be useful
 
