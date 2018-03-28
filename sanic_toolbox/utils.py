@@ -22,7 +22,9 @@ def search_modules(root, *args):
 
     relative_module_root = [root, *args]
     for module_name in sorted(
-        map(inspect.getmodulename, root_mod_path.glob('*.py'))
+        map(
+            lambda p: inspect.getmodulename(str(p)), root_mod_path.glob('*.py')
+        )
     ):
         if module_name == '__init__':
             continue

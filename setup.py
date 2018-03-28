@@ -28,7 +28,7 @@ setup_requires = ['pytest-runner']
 
 install_requires = []
 
-about = {'version': '0.3.0', 'description': ''}
+about = {'version': '0.3.1', 'description': ''}
 
 with open(
     os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8'

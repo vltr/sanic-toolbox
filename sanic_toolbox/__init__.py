@@ -8,7 +8,7 @@ from .utils import load_module, search_modules
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 __description__ = 'A general utility toolbox for Sanic to make middleware workflows simple and presumable, without monkey patching, for plugins and applications'
 
 
