@@ -23,27 +23,27 @@ def search_modules(root, *args):
     relative_module_root = [root, *args]
     for module_name in sorted(
         map(
-            lambda p: inspect.getmodulename(str(p)), root_mod_path.glob('*.py')
+            lambda p: inspect.getmodulename(str(p)), root_mod_path.glob("*.py")
         )
     ):
-        if module_name == '__init__':
+        if module_name == "__init__":
             continue
 
         yield [*relative_module_root, module_name]
 
 
 def load_module(module_name):
-    logger.debug('importing "{name}"'.format(name='.'.join(module_name)))
+    logger.debug('importing "{name}"'.format(name=".".join(module_name)))
     try:
-        return importlib.import_module('.'.join(module_name))
+        return importlib.import_module(".".join(module_name))
 
     except ImportError as ie:
         logger.exception(
             'could not import module "{}": {}'.format(
-                '.'.join(module_name), ie.msg
+                ".".join(module_name), ie.msg
             )
         )
         return None
 
 
-__all__ = ['search_modules', 'load_module']
+__all__ = ["search_modules", "load_module"]

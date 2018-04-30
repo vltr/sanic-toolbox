@@ -6,7 +6,7 @@ from sanic import Sanic
 from sanic.response import json
 
 from sanic_toolbox import lazyapp
-from sanic_toolbox.exceptions import (BeforeAndAfterNotSupported, TaskNotFound)
+from sanic_toolbox.exceptions import BeforeAndAfterNotSupported, TaskNotFound
 
 
 class Result:
@@ -91,12 +91,12 @@ def a_lazy_app():
 def test_tasks(a_lazy_app):
     dumb_app = a_lazy_app
 
-    real_app = dumb_app(Sanic(name='test-tasks'))
+    real_app = dumb_app(Sanic(name="test-tasks"))
 
-    @real_app.route('/')
+    @real_app.route("/")
     async def test(request):
-        return json({'hello': 'world'})
+        return json({"hello": "world"})
 
-    request, response = real_app.test_client.get('/')
+    request, response = real_app.test_client.get("/")
     assert response.status == 200
     assert Result.count == 63

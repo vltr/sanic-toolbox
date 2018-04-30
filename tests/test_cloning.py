@@ -44,22 +44,22 @@ def test_cloning(a_lazy_app):
     dumb_app = a_lazy_app
     cloned_dumb_app = dumb_app.clone()
 
-    real_app = dumb_app(Sanic(name='test-cloning-original'))
+    real_app = dumb_app(Sanic(name="test-cloning-original"))
 
-    @real_app.route('/')
+    @real_app.route("/")
     async def test(request):
-        return json({'hello': 'world'})
+        return json({"hello": "world"})
 
-    request, response = real_app.test_client.get('/')
+    request, response = real_app.test_client.get("/")
     assert response.status == 200
     assert Result.count == 15
 
-    clone_app = cloned_dumb_app(Sanic(name='test-cloning-clone'))
+    clone_app = cloned_dumb_app(Sanic(name="test-cloning-clone"))
 
-    @clone_app.route('/')
+    @clone_app.route("/")
     async def test_clone(request):
-        return json({'hello': 'clone'})
+        return json({"hello": "clone"})
 
-    request, response = clone_app.test_client.get('/')
+    request, response = clone_app.test_client.get("/")
     assert response.status == 200
     assert Result.count == 30

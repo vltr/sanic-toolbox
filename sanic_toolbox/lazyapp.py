@@ -50,13 +50,13 @@ class LazyApplication:
         return decorator
 
     def register_middleware(
-        self, middleware, attach_to='request', before=None, after=None
+        self, middleware, attach_to="request", before=None, after=None
     ):
 
         attach_middleware_to = []
-        if attach_to == 'request':
+        if attach_to == "request":
             attach_middleware_to = self._request_middleware
-        if attach_to == 'response':
+        if attach_to == "response":
             attach_middleware_to = self._response_middleware
 
         if any([before, after]):
@@ -136,15 +136,16 @@ class LazyApplication:
         for task in self._tasks:
             app.add_task(task())
         for middleware in self._request_middleware:
-            app.register_middleware(middleware, 'request')
+            app.register_middleware(middleware, "request")
         if not sanic_response_order:
             self._response_middleware.reverse()
         for middleware in self._response_middleware:
-            app.register_middleware(middleware, 'response')
+            app.register_middleware(middleware, "response")
         for event, listeners in self._listeners.items():
-            if event in (
-                'before_server_stop', 'after_server_stop'
-            ) and not sanic_listener_stop_order:
+            if (
+                event in ("before_server_stop", "after_server_stop")
+                and not sanic_listener_stop_order
+            ):
                 listeners.reverse()
             for listener in listeners:
                 app.listener(event)(listener)
@@ -173,4 +174,4 @@ def lazyapp():
     return LazyApplication()
 
 
-__all__ = ('lazyapp')
+__all__ = ("lazyapp")
