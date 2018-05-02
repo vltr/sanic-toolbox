@@ -18,96 +18,96 @@ class Result:
 
 @pytest.yield_fixture
 def myapp():
-    blueprint_one = Blueprint('one', url_prefix='/one')
-    nested_blueprint = blueprint_one.bp('test', url_prefix='/test')
-    blueprint_two = Blueprint('two', url_prefix='/two')
-    blueprint_three = SanicBlueprint('three', url_prefix='/three')
+    blueprint_one = Blueprint("one", url_prefix="/one")
+    nested_blueprint = blueprint_one.bp("test", url_prefix="/test")
+    blueprint_two = Blueprint("two", url_prefix="/two")
+    blueprint_three = SanicBlueprint("three", url_prefix="/three")
 
-    @bp_middleware(nested_blueprint, 'request')
+    @bp_middleware(nested_blueprint, "request")
     async def hello_from_nested_blueprint(request):
-        Result.request_middleware.append('hello_from_blueprint')
+        Result.request_middleware.append("hello_from_blueprint")
 
-    @bp_middleware(nested_blueprint, 'response')
+    @bp_middleware(nested_blueprint, "response")
     async def goodbye_from_nested_blueprint(request, response):
-        Result.response_middleware.append('goodbye_from_blueprint')
+        Result.response_middleware.append("goodbye_from_blueprint")
 
-    @bp_middleware(blueprint_two, 'request')
+    @bp_middleware(blueprint_two, "request")
     async def hello_from_blueprint_two(request):
-        return json({'hello': 'halted'})
+        return json({"hello": "halted"})
 
-    @blueprint_one.route('/')
+    @blueprint_one.route("/")
     async def one_root(request):
-        return json({'hello': 'one root'})
+        return json({"hello": "one root"})
 
-    @nested_blueprint.route('/')
+    @nested_blueprint.route("/")
     async def nested_root(request):
-        return json({'hello': 'nested root'})
+        return json({"hello": "nested root"})
 
-    @blueprint_two.route('/')
+    @blueprint_two.route("/")
     async def two_root(request):
-        return json({'hello': 'two root'})
+        return json({"hello": "two root"})
 
-    @blueprint_three.route('/')
+    @blueprint_three.route("/")
     async def three_root(request):
-        return json({'hello': 'three root'})
+        return json({"hello": "three root"})
 
-    app = Sanic(name='test-blueprints')
-    app.blueprint(blueprint_one, url_prefix='/this/will/be/ignored')
+    app = Sanic(name="test-blueprints")
+    app.blueprint(blueprint_one, url_prefix="/this/will/be/ignored")
     app.blueprint(blueprint_two)
-    app.blueprint(blueprint_three, url_prefix='/notthree')
+    app.blueprint(blueprint_three, url_prefix="/notthree")
 
-    @app.middleware('request')
+    @app.middleware("request")
     async def on_request(request):
-        Result.request_middleware.append('on_request')
+        Result.request_middleware.append("on_request")
 
-    @app.middleware('response')
+    @app.middleware("response")
     async def on_response(request, response):
-        Result.response_middleware.append('on_response')
+        Result.response_middleware.append("on_response")
 
-    @app.route('/')
+    @app.route("/")
     async def app_root(request):
-        return json({'hello': 'app root'})
+        return json({"hello": "app root"})
 
     yield app
 
 
 def test_strict_blueprint_middleware(myapp):
-    request, response = myapp.test_client.get('/')
+    request, response = myapp.test_client.get("/")
     assert response.status == 200
-    assert Result.request_middleware == ['on_request']
-    assert Result.response_middleware == ['on_response']
+    assert Result.request_middleware == ["on_request"]
+    assert Result.response_middleware == ["on_response"]
 
     Result.clear()
 
-    request, response = myapp.test_client.get('/one/test')
+    request, response = myapp.test_client.get("/one/test")
     assert response.status == 200
-    assert Result.request_middleware == ['hello_from_blueprint', 'on_request']
-    assert Result.response_middleware == [
-        'on_response', 'goodbye_from_blueprint'
-    ]
+    assert Result.request_middleware == ["hello_from_blueprint", "on_request"]
+    assert (
+        Result.response_middleware == ["on_response", "goodbye_from_blueprint"]
+    )
 
     Result.clear()
 
 
 def test_nested_blueprints(myapp):
-    request, response = myapp.test_client.get('/')
+    request, response = myapp.test_client.get("/")
     assert response.status == 200
-    assert response.json.get('hello') == 'app root'
+    assert response.json.get("hello") == "app root"
 
-    request, response = myapp.test_client.get('/one')
+    request, response = myapp.test_client.get("/one")
     assert response.status == 200
-    assert response.json.get('hello') == 'one root'
+    assert response.json.get("hello") == "one root"
 
-    request, response = myapp.test_client.get('/two')
+    request, response = myapp.test_client.get("/two")
     assert response.status == 200
-    assert response.json.get('hello') == 'halted'
+    assert response.json.get("hello") == "halted"
 
-    request, response = myapp.test_client.get('/notthree')
+    request, response = myapp.test_client.get("/notthree")
     assert response.status == 200
-    assert response.json.get('hello') == 'three root'
+    assert response.json.get("hello") == "three root"
 
-    request, response = myapp.test_client.get('/one/test')
+    request, response = myapp.test_client.get("/one/test")
     assert response.status == 200
-    assert response.json.get('hello') == 'nested root'
+    assert response.json.get("hello") == "nested root"
 
     Result.clear()

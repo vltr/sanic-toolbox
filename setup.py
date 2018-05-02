@@ -28,7 +28,7 @@ setup_requires = ['pytest-runner']
 
 install_requires = []
 
-about = {'version': '0.3.1', 'description': ''}
+about = {'version': '0.4.0', 'description': ''}
 
 with open(
     os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8'
@@ -56,7 +56,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    keywords='sanic toolbox utils plugin',
+    keywords='sanic toolbox utils lazy-evaluation productivity',
     packages=find_packages(exclude=['example', 'tests']),
     install_requires=install_requires,
     extras_require=extras_require,

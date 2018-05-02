@@ -14,18 +14,22 @@ To install:
 $ pip install sanic-toolbox
 ```
 
-_NOTE_: Those are likely (and mostly) experimentations with Sanic and probably will change over time until it reaches a stable version with all necessary tools working (and seamlessly).
+**NOTE**: Those are likely (and mostly) experimentations with Sanic and probably will change over time until it reaches a stable version with all _necessary_<sup>1</sup> tools working (and seamlessly).
+
+<sup>[1]</sup> definition needed yet.
 
 
 ## Features
 
 - [x] Do not monkey patch things inside Sanic
-- [x] Make middleware workflows presumable and simple to implement
-- [x] Make simple Sanic structures "lazy" and "cloneable"
-- [x] Ability to work with blueprints
-- [x] Utilities to import Python modules dynamically
-- [ ] Plugin chaining
+- [x] ~Make middleware workflows presumable and simple to implement~
+- [x] Make simple Sanic structures "lazy" and "reusable"
+- [x] Ability to work with blueprints, too!
+- [x] Utilities to import Python modules dynamically (is that really necessary?)
+- [ ] ~Plugin chaining~
+- [ ] Support for a wide range of plugins usage
 - [ ] More examples of how this can be useful
+- [ ] Documentation!
 
 ## License
 
