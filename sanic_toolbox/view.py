@@ -1,21 +1,21 @@
+lazy_decorators = {}
+lazy_views = {}
 
-func_decorators = {}
 
-
-def decorate(*a):
+def lazy_decorate(*a):
 
     def decorator(f):
-        decorators = [m for m in a if isinstance(m, MockCall)]
-        if f in func_decorators:
-            func_decorators[f] += decorators
+        decorators = [m for m in a if isinstance(m, MockableAttribute)]
+        if f in lazy_decorators:
+            lazy_decorators[f] += decorators
         else:
-            func_decorators[f] = decorators
+            lazy_decorators[f] = decorators
         return f
 
     return decorator
 
 
-class MockCall:
+class MockableAttribute:
 
     def __init__(self, attr, proxy):
         self.attr = attr
@@ -38,8 +38,8 @@ class ObjectProxy:
     def __init__(self):
         self.name = None
 
-    def __getattr__(self, item):
-        return MockCall(item, self)
+    def __getattr__(self, item, *a, **kw):
+        return MockableAttribute(item, self)
 
 
 class MetaView(type):
@@ -53,42 +53,34 @@ class MetaView(type):
 
         dct["_proxies"] = proxies
         cls = super().__new__(mcls, names, bases, dct)
+
+        if not hasattr(cls, "_registry"):
+            cls._registry = set()
+        if not cls.__ignore__:
+            cls._registry.add(cls)
+            cls._registry -= set(bases)
         return cls
 
-    def __init__(cls, names, bases, dct):
-        super().__init__(names, bases, dct)
-        if not hasattr(cls, "registry"):
-            cls.registry = set()
-        cls.registry.add(cls)
-        cls.registry -= set(bases)
-
     def __iter__(cls):
-        return iter(cls.registry)
+        return iter(cls._registry)
 
-    def __str__(cls):
-        if cls in cls.registry:
-            return cls.__name__
-        return cls.__name__ + ": " + ", ".join([sc.__name__ for sc in cls])
-
-    def __call__(cls, *args, **kw):
-        return super().__call__(*args, **kw)
-
-    def apply(cls, **kw):
-        for klass in cls.registry:
+    def register(cls, **kw):
+        for klass in cls:
             klass(**kw)
 
 
-class View(metaclass=MetaView):
+class AbstractLazyView:
+    __ignore__ = False
 
     def __init__(self, **kwargs):
-        self._apply_objects(**kwargs)
+        self._register_objects(**kwargs)
 
-    def _apply_objects(self, **kw):
+    def _register_objects(self, **kw):
         for key, value in kw.items():
             if key in self._proxies:
                 setattr(self, key, value)
 
-                for fn, mocks in func_decorators.items():
+                for fn, mocks in lazy_decorators.items():
                     if (
                         hasattr(self, fn.__name__)
                         and getattr(self.__class__, fn.__name__) == fn
@@ -113,3 +105,21 @@ class View(metaclass=MetaView):
                                             getattr(self, fn.__name__)
                                         ),
                                     )
+
+
+class LazyView(AbstractLazyView, metaclass=MetaView):
+    pass
+
+
+lazy_views.update({None: LazyView})
+
+
+def get_lazy_view(scope_name=None):
+    if scope_name not in lazy_views:
+        lazy_views.update(
+            {scope_name: MetaView(scope_name, (AbstractLazyView,), {})}
+        )
+    return lazy_views.get(scope_name)
+
+
+__all__ = ["lazy_decorate", "get_lazy_view", "ObjectProxy"]

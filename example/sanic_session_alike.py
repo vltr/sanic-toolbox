@@ -5,7 +5,7 @@ from sanic import Sanic
 from sanic.response import text
 
 import ujson
-from sanic_toolbox import lazyapp
+from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
 
 # DO NOT USE THIS IN PRODUCTION, THIS IS JUST A PROOF OF CONCEPT
 #
@@ -44,24 +44,24 @@ class MyInterface:
         response.headers['sid'] = sid
 
 
-def get_plugin():
-    plugin = lazyapp()
-    interface = MyInterface()
+class SanicSession(get_lazy_view()):
+    app = ObjectProxy()
+    interface = ObjectProxy()
 
-    @plugin.middleware('request')
-    async def add_session_to_request(request):
-        await interface.open(request)
+    @lazy_decorate(app.middleware("request"))
+    async def add_session_to_request(self, request):
+        await self.interface.open(request)
 
-    @plugin.middleware('response')
-    async def save_session(request, response):
-        await interface.save(request, response)
-
-    return plugin
+    @lazy_decorate(app.middleware("response"))
+    async def save_session(self, request, response):
+        await self.interface.save(request, response)
 
 
 def main():
-    sanic_session = get_plugin()
-    app = sanic_session(Sanic(name='my-sanic-session'))
+    app = Sanic(name="my-sanic-session")
+    interface = MyInterface()
+
+    SanicSession.register(app=app, interface=interface)
 
     @app.route('/')
     async def index(request):

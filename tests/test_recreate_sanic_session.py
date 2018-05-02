@@ -1,13 +1,11 @@
 import binascii
 import os
 
-import pytest
 from sanic import Sanic
 from sanic.response import text
 
 import ujson
-from sanic_toolbox import lazyapp
-
+from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
 
 # DO NOT USE THIS IN PRODUCTION, THIS IS JUST A PROOF OF CONCEPT
 
@@ -40,24 +38,23 @@ class MyInterface:
         response.headers["sid"] = sid
 
 
-@pytest.fixture
-def sanic_session():
-    plugin = lazyapp()
+class SanicSessionView(get_lazy_view("sanic_session")):
+    app = ObjectProxy()
     interface = MyInterface()
 
-    @plugin.middleware("request")
-    async def add_session_to_request(request):
-        await interface.open(request)
+    @lazy_decorate(app.middleware("request"))
+    async def add_session_to_request(self, request):
+        await self.interface.open(request)
 
-    @plugin.middleware("response")
-    async def save_session(request, response):
-        await interface.save(request, response)
-
-    yield plugin
+    @lazy_decorate(app.middleware("response"))
+    async def save_session(self, request, response):
+        await self.interface.save(request, response)
 
 
-def test_sanic_session_like_plugin(sanic_session):
-    app = sanic_session(Sanic(name="my-sanic-session"))
+def test_sanic_session_like_plugin():
+    app = Sanic(name="my-sanic-session")
+
+    SanicSessionView.register(app=app)
 
     @app.route("/")
     async def index(request):
