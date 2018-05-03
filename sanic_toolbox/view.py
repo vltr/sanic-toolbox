@@ -74,6 +74,10 @@ class AbstractLazyView:
 
     def __init__(self, **kwargs):
         self._register_objects(**kwargs)
+        self.__post_init__()
+
+    def __post_init__(self):  # noqa
+        pass
 
     def _register_objects(self, **kw):
         for key, value in kw.items():
@@ -107,19 +111,22 @@ class AbstractLazyView:
                                     )
 
 
-class LazyView(AbstractLazyView, metaclass=MetaView):
-    pass
-
-
-lazy_views.update({None: LazyView})
-
-
-def get_lazy_view(scope_name=None):
-    if scope_name not in lazy_views:
+def make_lazy_view(context_name=None, base_cls=None):
+    if context_name is None:
+        context_name = "LazyView"
         lazy_views.update(
-            {scope_name: MetaView(scope_name, (AbstractLazyView,), {})}
+            {context_name: MetaView(context_name, (AbstractLazyView,), {})}
         )
-    return lazy_views.get(scope_name)
+    if context_name not in lazy_views:
+        if base_cls is None:
+            base_cls = (AbstractLazyView,)
+        else:
+            if isinstance(base_cls, (tuple, list)):
+                base_cls = (AbstractLazyView, *base_cls)
+            else:
+                base_cls = (AbstractLazyView, base_cls)
+        lazy_views.update({context_name: MetaView(context_name, base_cls, {})})
+    return lazy_views.get(context_name)
 
 
-__all__ = ["lazy_decorate", "get_lazy_view", "ObjectProxy"]
+__all__ = ["lazy_decorate", "make_lazy_view", "ObjectProxy"]

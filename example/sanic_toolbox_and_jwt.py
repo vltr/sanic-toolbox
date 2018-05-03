@@ -4,7 +4,7 @@ from sanic import Sanic
 from sanic.response import json
 
 from sanic_jwt import Initialize
-from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
+from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
 # With curl, run:
 #
@@ -14,8 +14,10 @@ from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
 #
 # curl -iv http://127.0.0.1:8000/ -H "Authorization: Bearer <token>"
 
+LazyView = make_lazy_view()
 
-class MyCustomView(get_lazy_view()):
+
+class MyCustomView(LazyView):
     app = ObjectProxy()
     sanicjwt = ObjectProxy()
 
@@ -36,7 +38,7 @@ class MyCustomView(get_lazy_view()):
         assert self.app == app
 
 
-class AnotherCustomView(get_lazy_view()):
+class AnotherCustomView(LazyView):
     app = ObjectProxy()
 
     @lazy_decorate(app.middleware)
@@ -58,7 +60,7 @@ def main():
     app = Sanic()
     sanicjwt = Initialize(app, authenticate=authenticate, debug=True)
 
-    get_lazy_view().register(sanicjwt=sanicjwt, app=app)
+    LazyView.register(sanicjwt=sanicjwt, app=app)
     app.run(port=8000)
 
 

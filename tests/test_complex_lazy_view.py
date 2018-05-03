@@ -1,12 +1,13 @@
 import uuid
-from sanic.response import json
+
 from sanic import Sanic
+from sanic.response import json
 
-from sanic_toolbox import lazy_decorate, get_lazy_view, ObjectProxy
+from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
 
-class MyAbstractView(get_lazy_view("my_abstract_view")):
-    pass
+MyAbstractView = make_lazy_view("my_abstract_view")
+OtherView = make_lazy_view("other_view")
 
 
 class MyCustomView(MyAbstractView):
@@ -35,7 +36,7 @@ class IgnoredCustomView(MyAbstractView):
         return json({"hello": "ignored"})
 
 
-class AnotherCustomView(get_lazy_view("other_view")):
+class AnotherCustomView(OtherView):
     app = ObjectProxy()
 
     @lazy_decorate(app.middleware)

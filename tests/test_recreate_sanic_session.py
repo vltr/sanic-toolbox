@@ -5,7 +5,7 @@ from sanic import Sanic
 from sanic.response import text
 
 import ujson
-from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
+from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
 # DO NOT USE THIS IN PRODUCTION, THIS IS JUST A PROOF OF CONCEPT
 
@@ -38,7 +38,7 @@ class MyInterface:
         response.headers["sid"] = sid
 
 
-class SanicSessionView(get_lazy_view("sanic_session")):
+class SanicSessionView(make_lazy_view("sanic_session")):
     app = ObjectProxy()
     interface = MyInterface()
 

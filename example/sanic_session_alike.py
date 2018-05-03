@@ -5,7 +5,7 @@ from sanic import Sanic
 from sanic.response import text
 
 import ujson
-from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
+from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
 # DO NOT USE THIS IN PRODUCTION, THIS IS JUST A PROOF OF CONCEPT
 #
@@ -14,6 +14,8 @@ from sanic_toolbox import get_lazy_view, lazy_decorate, ObjectProxy
 # curl -v http://127.0.0.1:8000/
 # or
 # curl -v -H "Sid: <SID>" http://127.0.0.1:8000/
+
+LazyView = make_lazy_view()
 
 
 class MyInterface:
@@ -44,7 +46,7 @@ class MyInterface:
         response.headers['sid'] = sid
 
 
-class SanicSession(get_lazy_view()):
+class SanicSession(LazyView):
     app = ObjectProxy()
     interface = ObjectProxy()
 
@@ -62,6 +64,8 @@ def main():
     interface = MyInterface()
 
     SanicSession.register(app=app, interface=interface)
+    # or
+    # LazyView.register(app=app, interface=interface)
 
     @app.route('/')
     async def index(request):

@@ -28,7 +28,7 @@ setup_requires = ['pytest-runner']
 
 install_requires = []
 
-about = {'version': '0.4.0', 'description': ''}
+about = {'version': '0.5.0', 'description': ''}
 
 with open(
     os.path.join(here, 'sanic_toolbox', '__init__.py'), 'r', encoding='utf-8'
@@ -49,7 +49,7 @@ setup(
     author_email='rkuesters@gmail.com',
     license='MIT',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3 :: Only',
