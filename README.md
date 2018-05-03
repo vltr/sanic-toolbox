@@ -339,7 +339,7 @@ This is the main function that creates (and caches) classes based on [`MetaView`
 The method has two optional parameters: `context_name` and `base_cls`.
 
 - `context_name`, _optional_: is a string that represents the name of this view, more like a context tracking mechanism, so every class or subclass of this "context" will be kept track and automatically assigned when the `register` method of any (of these classes) is called.
-- `base_cls`, _optional_: following the pattern of [`declarative_base` from SQLAlchemy](http://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/api.html#sqlalchemy.ext.declarative.declarative_base), you can add one or more (using a list or tuple) classes to be inherited into the newest created class. **Note**: Since this method already uses a Metaclass, it is not recommended to use other classes that uses metaclasses too!
+- `base_cls`, _optional_: following the pattern of [`declarative_base` from SQLAlchemy](http://docs.sqlalchemy.org/en/latest/orm/extensions/declarative/api.html#sqlalchemy.ext.declarative.declarative_base), you can add one or more (using a list or tuple) classes to be inherited into the newest created class. **Note**: Since this method already uses a metaclass, it is not recommended to use other classes that uses metaclasses too!
 
 Example:
 
