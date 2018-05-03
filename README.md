@@ -299,7 +299,7 @@ MyAppView = make_lazy_view()
 class MyRoutes(MyAppView):  # this changes
     app = ObjectProxy()  # this too
 
-    @lazy_decorate(app.route("/"))  # minor change to the
+    @lazy_decorate(app.route("/"))  # minor change to the decorator (just wrap)
     async def index(self, request):
         pass
 
