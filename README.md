@@ -9,7 +9,7 @@
 Some useful classes to work with Sanic (that might depend on what you want to do with it).
 **NOTE**: Those are likely (and mostly) experimentations with Sanic and probably will change over time until it reaches a stable version with all _necessary_<sup>1</sup> tools working (and seamlessly). Please, [open up an issue](https://github.com/vltr/sanic-toolbox/issues) if you need support or anything else related (bugs included, of course!), since it is not ready for production (yet).
 
-<sup>[1]</sup> <sub>definition of what this means to be defined yet.</sub>
+<sub><sup>[1]</sup> definition of what this means to be defined yet.</sub>
 
 ## Features
 
@@ -27,7 +27,7 @@ To install:
 $ pip install sanic-toolbox
 ```
 
-The basic usage of `sanic-toolbox` is based on the possibility to create lazy objects representing callables or direct injection of objects to simplify the development of your Sanic based applications.
+The main usage of `sanic-toolbox` is based on the possibility to create lazy objects representing callables or direct injection of objects to simplify the development of your Sanic based applications.
 
 ### Quick Example
 
@@ -99,14 +99,6 @@ from sanic.response import text
 import ujson
 from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
-# DO NOT USE THIS IN PRODUCTION, THIS IS JUST A PROOF OF CONCEPT
-#
-# With curl, run:
-#
-# curl -iv http://127.0.0.1:8000/
-# or
-# curl -iv -H "Sid: <SID>" http://127.0.0.1:8000/
-
 LazyView = make_lazy_view()
 
 
@@ -154,10 +146,7 @@ class SanicSession(LazyView):
 def main():
     app = Sanic(name="my-sanic-session")
     interface = MyInterface()
-
     SanicSession.register(app=app, interface=interface)
-    # or
-    # LazyView.register(app=app, interface=interface)
 
     @app.route('/')
     async def index(request):
@@ -230,7 +219,7 @@ Content-Type: text/plain; charset=utf-8
 2
 ```
 
-Great! It does works! But, remember, do not use this in production!
+Great! It does work! But, remember, **do not use** the above code in production!
 
 You can check this example [here](https://raw.githubusercontent.com/vltr/sanic-toolbox/master/example/sanic_session_alike.py). All credits for [Sanic Session](https://github.com/subyraman/sanic_session) belong to its respective authors.
 
@@ -257,9 +246,11 @@ async def index(request):
     pass
 ```
 
-Allright, not bad. But if you want some boilerplate, to create your MVC pattern and use some plugins, things can get a little more complicated. You can extend your own `Request`, `Blueprint` or even `Router` classes ... But you still depends on instances.
+Allright, not bad. But if you want some boilerplate, to create your MVC pattern and use some plugins, things can get a little more complicated. You can extend your own `Request`, `Blueprint` or even `Router` classes ... But you still depend on instances.
 
-Great, you can create classes and pass those instances as arguments to use their decorators ...
+_Possible solutions_: singletons? Circular references? I don't think so.
+
+Well, you can create classes and pass those instances as arguments to use their decorators ...
 
 ```python
 
@@ -296,10 +287,12 @@ app.middleware("request")(routes.my_middleware)
 
 Yeah, well, definitely no.
 
-But, what if you could make all those Sanic and plugin instances be lazy, implement all your code (in a manageable way) and still provide the flexibility you are used for using classes? That would be great, right? What if you could reuse code inside one your application? Even better?
+But, what if you could make all those Sanic and plugin instances _be lazy_, implement all your code (in a manageable way) and still provide the flexibility you are used for using classes? That would be great, right? What if you could reuse code inside your application? Even better, perhaps?
 
 ```python
 # myapp/some/path/routes.py
+
+from sanic_tolboox import make_lazy_view, lazy_decorator, ObjectProxy
 
 MyAppView = make_lazy_view()
 
@@ -320,6 +313,10 @@ Not so fantastic. But, you can do this _without_ a Sanic instance is even create
 ```python
 # myapp/server.py
 
+from Sanic import Sanic
+from sanic_toolbox import make_lazy_view
+
+
 def run_sanic():
     app = Sanic()
     # MyAppView.register(app=app)
@@ -335,7 +332,7 @@ def run_sanic():
 
 ## Function and object references
 
-### **`make_lazy_view(context_name=None, base_cls=None)`**
+### **`make_lazy_view([context_name=None[, base_cls=None]])`**
 
 This is the main function that creates (and caches) classes based on [`MetaView`](https://github.com/vltr/sanic-toolbox/blob/master/sanic_toolbox/view.py#L45), the metaclass responsible for mapping class keywords (like `app = ObjectProxy()`) to the actual instances when the method `register` is called (from the resulting class).
 
@@ -349,6 +346,8 @@ Example:
 ```python
 import datetime
 import uuid
+
+from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
 
 class DatetimeHelper:
@@ -390,11 +389,36 @@ When your view is created, you can, after having all instances created, call the
 
 ### **`YourView.__post_init__(self)`**
 
-If you need to run some extra boilerplate after the class is instantiated, the `__post_init__` hook is available to be implemented and will be automatically called _after_ `register` has completed. Of course, you can use `__init__` with `super()`, but this is not encouraged.
+If you need to run some extra boilerplate code after the class is instantiated, the `__post_init__` hook is available to be implemented and will be automatically called _after_ `register` has completed. Of course, you can use `__init__` with `super()`, but this is not encouraged.
+
+Example:
+
+```python
+import logging
+
+from sanic.response import json
+from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
+
+BaseView = make_lazy_view("BaseView")
+logger = logging.getLogger(__name__)
+
+
+class MyView(BaseView):
+
+    app = ObjectProxy()
+
+    def __post_init__(self):
+        logger.debug("MyView was instantiated!")
+
+    @lazy_decorate(app.route("/"))
+    async def index(self, request):
+        return json({"hello": "world"})
+
+```
 
 ### **`YourView.__ignore__`**
 
-This bool, if set to `True`, will not initialize the class neither keep record on the registry. Useful for development.
+This bool, if set to `True`, will not initialize the class neither keep record of it in the registry. Useful for development.
 
 
 ## Examples
@@ -405,7 +429,7 @@ This bool, if set to `True`, will not initialize the class neither keep record o
 ## To Do
 
 - [ ] Documentation on RTFM (for v1.0)
-- [ ] Get rid of the `@lazy_decorate` decorator?
+- [ ] Get rid of the `@lazy_decorate` decorator (it can be merged inside the ObjectProxy)?
 - [ ] More examples of how this can be useful
 - [ ] Keep dependency usage low (zero for now, this can even have other usages!)
 
