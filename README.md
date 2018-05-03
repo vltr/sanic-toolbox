@@ -231,7 +231,7 @@ Great, you want to build a Sanic app! Allright, so, how would you split all func
 ```python
 # myapp/__init__.py
 
-from Sanic import Sanic
+from sanic import Sanic
 
 app = Sanic()
 ```
@@ -313,7 +313,7 @@ Not so fantastic. But, you can do this _without_ a Sanic instance is even create
 ```python
 # myapp/server.py
 
-from Sanic import Sanic
+from sanic import Sanic
 from sanic_toolbox import make_lazy_view
 
 
@@ -396,6 +396,7 @@ Example:
 ```python
 import logging
 
+from sanic import Sanic
 from sanic.response import json
 from sanic_toolbox import make_lazy_view, lazy_decorate, ObjectProxy
 
